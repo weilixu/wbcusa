@@ -13,9 +13,11 @@ from .forms import NewUserCreationForm, UserLoginForm
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
+@login_required(login_url=('accounts/login/'))
 def dashboard(request):
-    return render(request, "users/dashboard.html")
+    return render(request, "platform/dashboard.html")
 
 # user registration view
 def register(request):

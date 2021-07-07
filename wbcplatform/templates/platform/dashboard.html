@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block nav_status%}
+display:block
+{% endblock %}
+
+{% block pagewrapper_status%}
+display:block
+{% endblock %}
+
+
+{% block pagecontent %}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-4">
+            <a href="{url '#'}">
+                <div class="widget lazur-bg p-xl">
+                    <h2>{{user.username|default:'Guest'}}</h2>
+                    <ul class="list-unstyled m-t-md">
+                        <li>
+                            <span class="fa fa-envelope m-r-xs"></span>
+                            <label>Email:</label>
+                            {{user.email|default:'abc@edf.com'}}
+                        </li>
+                        <li>
+                            <span class="fa fa-home m-r-xs"></span>
+                            <label>Address:</label>
+                            {{user.address|default:'Unknown'}}
+                        </li>
+                        <li>
+                            <span class="fa fa-phone m-r-xs"></span>
+                            <label>Contact:</label>
+                            {{user.phone|default:'(111)111111'}}
+                        </li>
+                    </ul>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+<div>
+    {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}">Logout</a>
+        <a href="{% url 'password_change' %}">Change password</a>
+    {% else %}
+        <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block page_js %}
+    <script src="{% static 'js/plugins/iCheck/icheck.min.js'%}"></script>
+    <script src="{% static 'js/plugins/metisMenu/jquery.metisMenu.js'%}"></script>
+    <script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js'%}"></script>
+
+    <!-- jquery UI -->
+    <script src="{% static 'js/plugins/jquery-ui/jquery-ui.min.js'%}"></script>
+
+    <!-- Touch Punch -->
+    <script src="{% static 'js/plugins/touchpunch/jquery.ui.touch-punch.min.js'%}"></script>
+
+    <!-- Custom and plugin javascript -->
+    <script src="{% static 'js/inspinia.js'%}"></script>
+    <script src="{% static 'js/plugins/pace/pace.min.js'%}"></script>
+
+    <!-- Jvectormap -->
+    <script src="{% static 'js/plugins/jvectormap/jquery-jvectormap-2.0.2.min.js'%}"></script>
+    <script src="{% static 'js/plugins/jvectormap/jquery-jvectormap-world-mill-en.js'%}"></script>
+
+    <!-- Flot -->
+    <script src="{% static 'js/plugins/flot/jquery.flot.js'%}"></script>
+    <script src="{% static 'js/plugins/flot/jquery.flot.tooltip.min.js'%}"></script>
+    <script src="{% static 'js/plugins/flot/jquery.flot.resize.js'%}"></script>
+{% endblock %}
+
+
+
