@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block content %}
+<p>Your account is successfully verified!</p>
+<p>After 5 seconds you will be redirected to the main page</p>
+<meta http-equiv="refresh" content="5;url={% url 'login' %}">
+{% endblock %}
