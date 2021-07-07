@@ -1,4 +1,47 @@
 <!--users/templates/base.html-->
+{% load static %} <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block page_meta%}
+    {% endblock %}
 
-{% block content %}
+    {# Global styles #}
+    {% block site_css %}
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'font-awesome/css/font-awesome.css' %}" rel="stylesheet">
+    <link href="{% static 'css/animate.css' %}" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    {% endblock %}
+
+    {# Page-specific styles #}
+    {% autoescape off%}
+    {% block page_css %}{% endblock %}
+    {% endautoescape %}
+
+    <title>{% block page_title%}{% endblock%}</title>
+</head>
+<body class="{% block body_class %}{% endblock %}">
+{% block body %}
 {% endblock %}
+
+{# Modal HTML #}
+{% block modals %}
+{% endblock %}
+
+{# Global javascript #}
+{% block site_js %}
+    <script src="{% static 'js/jquery-3.1.1.min.js'%}"></script>
+    <script src="{% static 'js/popper.min.js'%}"></script>
+    <script src="{% static 'js/bootstrap.js'%}"></script>
+{% endblock %}
+
+{# Page javascript #}
+{% autoescape off %}
+    {% block page_js %}
+    {% endblock %}
+{% endautoescape%}
+
+</body>
+</html>

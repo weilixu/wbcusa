@@ -1,20 +1,16 @@
 <!--registration/login.html-->
+{% extends 'base.html' %}
+{% load static %}
 
-{% load static %} <!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block page_title%}
+WBCUSA | Login
+{% endblock%}
 
-    <title>WBCUSA | Login</title>
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'font-awesome/css/font-awesome.css' %}" rel="stylesheet">
-    <link href="{% static 'css/animate.css' %}" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+{% block body_class %}
+gray-bg
+{% endblock %}
 
-</head>
-
-<body class="gray-bg">
+{% block body %}
     <div class="middle-box text-center loginscreen animated fadeInDown">
         <div>
             <div>
@@ -40,7 +36,6 @@
 
         </div>
     </div>
-</body>
+{% endblock %}
 
-</html>
 
