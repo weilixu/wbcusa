@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block nav_status%}
+display:block
+{% endblock %}
+
+{% block pagewrapper_status%}
+display:block
+{% endblock %}
+
+{% block pagecontent%}
+<div class="wrapper wrapper-content animated fadeInRight" style="margin-left: 20px;">
+    <div class="row">
+        <h2 style="margin-left: 15px; margin-bottom: 30px">Personal account</h2>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="tabs-container">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li><a class="nav-link active" data-toggle="tab" href="#tab-general">General</a></li>
+                    <li><a class="nav-link" data-toggle="tab" href="#tab-security">Security</a></li>
+                    <li><a class="nav-link" data-toggle="tab" href="#tab-notification">Notification</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div role="tabpanel" id="tab-general" class="tab-pane active">
+                        <div class="panel-body">
+                            <form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div>
+                                            <label for="first_name">First Name</label>
+                                            <input name="first_name" class="form-control" id="first_name" type="text"
+                                                placeholder="Enter your first name" value="{{ profile.user.first_name }}"
+                                                required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div>
+                                            <label for="last_name">Last Name</label>
+                                            <input name="last_name" class="form-control" id="last_name" type="text"
+                                                placeholder="Also your last name" value="{{ profile.user.last_name }}"
+                                                required>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row align-items-center">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="birthday">Birthday</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><span class="fa fa-calendar"></span></span>
+                                            <input name="birthday" data-datepicker="" class="form-control" id="birthday"
+                                                   type="text" placeholder="dd/mm/yyyy" value="{{ profile.birthday|date:'m/d/Y'|default:''}}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="gender">Gender</label>
+                                        <select name="gender" class="form-select mb-0" id="gender"
+                                            aria-label="Gender select">
+                                            <option selected>Gender</option>
+                                            {% for key, value in profile.GENDER_CHOICES %}
+                                            <option value="{{ key }}" {% if profile.gender == key %}selected{% endif %}>{{ value }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div role="tabpanel" id="tab-security" class="tab-pane">
+                        <div class="panel-body">
+                            <p>Lorem ipsum dolor site amet</p>
+                        </div>
+                    </div>
+                    <div role="tabpanel" id="tab-notification" class="tab-pane">
+                        <div class="panel-body">
+                            <p>Lorem ipsum dolor site amet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block page_js %}
+    <script src="{% static 'js/plugins/iCheck/icheck.min.js'%}"></script>
+    <script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js'%}"></script>
+
+    <!-- Custom and plugin javascript -->
+    <script src="{% static 'js/inspinia.js'%}"></script>
+    <script src="{% static 'js/plugins/pace/pace.min.js'%}"></script>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-# Create your views here.
+# import from django
 from django.shortcuts import redirect, render
 from django.contrib.auth import login
 from django.urls import reverse
@@ -8,16 +8,52 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_text
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
-from .tokens import account_activation_token
-from .forms import NewUserCreationForm, UserLoginForm
 from django.core.mail import EmailMessage
 from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.contrib import messages
+from django.views import View
+
+
+# import from app
+from .models import Profile
+from .tokens import account_activation_token
+from .forms import NewUserCreationForm, UserLoginForm, ProfileForm, form_validation_error
 
 @login_required(login_url=('accounts/login/'))
 def dashboard(request):
     return render(request, "platform/dashboard.html")
+
+@method_decorator(login_required(login_url='accounts/login/'), name='dispatch')
+class ProfileView(View):
+    profile = None
+
+    def dispath(self, request, *args, **kwargs):
+        self.profile, _ = Profile.objects.get_or_create(user=request.user)
+        return super(ProfileView, self)
+
+    def get(self, request):
+        context = {'profile': self.profile}
+        return render(request,'users/profile_settings.html', context)
+
+    def post(self, request):
+        form = ProfileForm(request.POST, request.FILES, instance=self.profile)
+
+        if form.is_valid():
+            profile = form.save()
+
+            # to save user model info
+            profile.user.first_name = form.cleaned_data.get('first_name')
+            profile.user.last_name = form.cleaned_data.get('last_name')
+            profile.user.email = form.cleaned_data.get('email')
+            profile.user.save()
+
+            messages.success(request, 'Profile saved successfully')
+        else:
+            messages.error(request, form_validation_error(form))
+        return redirect('profile')
 
 # user registration view
 def register(request):

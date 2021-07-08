@@ -35,7 +35,9 @@
                             <span class="text-muted text-xs block">Art Director <b class="caret"></b></span>
                         </a>
                         <ul class="dropdown-menu animated fadeInRight m-t-xs">
-                            <li><a class="dropdown-item" href="{% url 'login'%}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'login'%}">Settings</a></li>
+                            <li class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
                         </ul>
                     </div>
                     <div class="logo-element">
@@ -72,6 +74,9 @@
     <script src="{% static 'js/jquery-3.1.1.min.js'%}"></script>
     <script src="{% static 'js/popper.min.js'%}"></script>
     <script src="{% static 'js/bootstrap.js'%}"></script>
+
+    <script src="{% static 'js/plugins/metisMenu/jquery.metisMenu.js'%}"></script>
+
 {% endblock %}
 
 {# Page javascript #}
