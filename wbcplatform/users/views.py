@@ -22,9 +22,11 @@ from .models import Profile
 from .tokens import account_activation_token
 from .forms import NewUserCreationForm, UserLoginForm, ProfileForm, form_validation_error
 
+
 @login_required(login_url=('accounts/login/'))
 def dashboard(request):
     return render(request, "platform/dashboard.html")
+
 
 @method_decorator(login_required(login_url='accounts/login/'), name='dispatch')
 class ProfileView(View):
@@ -40,7 +42,6 @@ class ProfileView(View):
 
     def post(self, request):
         form = ProfileForm(request.POST, request.FILES, instance=self.profile)
-
         if form.is_valid():
             profile = form.save()
 
@@ -54,6 +55,7 @@ class ProfileView(View):
         else:
             messages.error(request, form_validation_error(form))
         return redirect('profile')
+
 
 # user registration view
 def register(request):

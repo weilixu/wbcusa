@@ -4,6 +4,10 @@ from django.utils.translation import gettext as _
 from django.templatetags.static import static
 
 
+def user_directory_path(instance, filename):
+    return 'profile_img/{0}/{1}'.format(instance.user.id, filename)
+
+
 class Profile(models.Model):
     GENDER_MALE = 1
     GENDER_FEMALE = 2
@@ -13,7 +17,7 @@ class Profile(models.Model):
     ]
 
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
-    avatar = models.ImageField(upload_to="static/img/profile", null=True, blank=True)
+    avatar = models.ImageField(upload_to=user_directory_path, null=True, blank=True)
     birthday = models.DateField(null=True, blank=True)
     gender = models.PositiveSmallIntegerField(choices=GENDER_CHOICES, null=True, blank=True)
     phone = models.CharField(max_length=32, null=True, blank=True)
@@ -31,4 +35,4 @@ class Profile(models.Model):
 
     @property
     def get_avatar(self):
-        return self.avatar.url if self.avatar else static('assets/img/team/default-profile-picture.png')
+        return self.avatar.url if self.avatar else static('img/profile_small.jpg')
