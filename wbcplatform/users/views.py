@@ -30,13 +30,13 @@ def dashboard(request):
 class ProfileView(View):
     profile = None
 
-    def dispath(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         self.profile, _ = Profile.objects.get_or_create(user=request.user)
-        return super(ProfileView, self)
+        return super(ProfileView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request):
-        context = {'profile': self.profile}
-        return render(request,'users/profile_settings.html', context)
+        context = {'profile': self.profile, 'segment': 'profile'}
+        return render(request, 'users/profile_settings.html', context)
 
     def post(self, request):
         form = ProfileForm(request.POST, request.FILES, instance=self.profile)
