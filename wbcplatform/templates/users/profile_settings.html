@@ -200,12 +200,25 @@ display:block
                     </div>
                     <div role="tabpanel" id="tab-security" class="tab-pane">
                         <div class="panel-body">
-                            <p>Lorem ipsum dolor site amet</p>
+                            <div class="row">
+                                <div class="col-12 col-xl-8">
+                                    <div class="ibox">
+                                        <div class="ibox-content">
+                                            <div id="password-reset">
+                                                <h4>Password Reset: </h4>
+                                                <a href="{% url 'password_reset'%}" >
+                                                    <button type="button" class="btn btn-primary">RESET</button>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div role="tabpanel" id="tab-notification" class="tab-pane">
                         <div class="panel-body">
-                            <p>Lorem ipsum dolor site amet</p>
+                            <p>Notification is coming</p>
                         </div>
                     </div>
                 </div>
