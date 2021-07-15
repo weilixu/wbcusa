@@ -53,7 +53,8 @@ class ProfileView(View):
 
             messages.success(request, 'Profile saved successfully')
         else:
-            messages.error(request, form_validation_error(form))
+            print(form_validation_error(form))
+            # messages.error(request, form_validation_error(form))
         return redirect('profile')
 
 
