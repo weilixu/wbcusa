@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-wktw9+1k)z$_!^4p@xxsv-ih#od%w0+^8c6x(f_rjgx$pm*lap
 DEBUG = True
 
 # Temp
-ALLOWED_HOSTS = ['localhost']
+ALLOWED_HOSTS = ['localhost', 'wbc.0svc.com']
 
 
 # Application definition
