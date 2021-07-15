@@ -22,25 +22,26 @@ from .models import Profile
 from .tokens import account_activation_token
 from .forms import NewUserCreationForm, UserLoginForm, ProfileForm, form_validation_error
 
+
 @login_required(login_url=('accounts/login/'))
 def dashboard(request):
     return render(request, "platform/dashboard.html")
+
 
 @method_decorator(login_required(login_url='accounts/login/'), name='dispatch')
 class ProfileView(View):
     profile = None
 
-    def dispath(self, request, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         self.profile, _ = Profile.objects.get_or_create(user=request.user)
-        return super(ProfileView, self)
+        return super(ProfileView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request):
-        context = {'profile': self.profile}
-        return render(request,'users/profile_settings.html', context)
+        context = {'profile': self.profile, 'segment': 'profile'}
+        return render(request, 'users/profile_settings.html', context)
 
     def post(self, request):
         form = ProfileForm(request.POST, request.FILES, instance=self.profile)
-
         if form.is_valid():
             profile = form.save()
 
@@ -52,8 +53,10 @@ class ProfileView(View):
 
             messages.success(request, 'Profile saved successfully')
         else:
-            messages.error(request, form_validation_error(form))
+            print(form_validation_error(form))
+            # messages.error(request, form_validation_error(form))
         return redirect('profile')
+
 
 # user registration view
 def register(request):

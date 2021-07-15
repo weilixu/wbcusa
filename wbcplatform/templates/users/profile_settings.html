@@ -9,6 +9,37 @@ display:block
 display:block
 {% endblock %}
 
+{% block page_css %}
+<style type="text/css">
+    img.circle-border{
+        border: 6px solid #686868;
+    }
+
+    .hidden-image-value{
+        display: none
+    }
+    .p-image {
+        position: absolute;
+        top: 95px;
+        left: 28%;
+        color: #666666;
+        transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+    }
+    .p-image:hover {
+        transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+    }
+    .upload-button {
+        font-size: 1.2em;
+    }
+
+    .upload-button:hover {
+        transition: all .3s cubic-bezier(.175, .885, .32, 1.275);
+        color: #999;
+    }
+</style>
+    <link href="{% static 'css/plugins/cropper/cropper.min.css' %}" rel="stylesheet">
+{% endblock %}
+
 {% block pagecontent%}
 <div class="wrapper wrapper-content animated fadeInRight" style="margin-left: 20px;">
     <div class="row">
@@ -25,45 +56,143 @@ display:block
                 <div class="tab-content">
                     <div role="tabpanel" id="tab-general" class="tab-pane active">
                         <div class="panel-body">
-                            <form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data">
+                            <form action="{% url 'profile' %}" method="POST" enctype="multipart/form-data" id="formUpload">
                                 {% csrf_token %}
                                 <div class="row">
-                                    <div class="col-md-6 mb-3">
-                                        <div>
-                                            <label for="first_name">First Name</label>
-                                            <input name="first_name" class="form-control" id="first_name" type="text"
+                                    <div class="col-12 col-xl-8">
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <div>
+                                                    <label for="first_name">First Name</label>
+                                                    <input name="first_name" class="form-control" id="first_name" type="text"
                                                 placeholder="Enter your first name" value="{{ profile.user.first_name }}"
                                                 required>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-3">
-                                        <div>
-                                            <label for="last_name">Last Name</label>
-                                            <input name="last_name" class="form-control" id="last_name" type="text"
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <div>
+                                                    <label for="last_name">Last Name</label>
+                                                    <input name="last_name" class="form-control" id="last_name" type="text"
                                                 placeholder="Also your last name" value="{{ profile.user.last_name }}"
                                                 required>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-
-                                <div class="row align-items-center">
-                                    <div class="col-md-6 mb-3">
-                                        <label for="birthday">Birthday</label>
-                                        <div class="input-group">
-                                            <span class="input-group-text"><span class="fa fa-calendar"></span></span>
-                                            <input name="birthday" data-datepicker="" class="form-control" id="birthday"
+                                        <div class="row align-items-center">
+                                            <div class="col-md-6 mb-3">
+                                                <label for="birthday">Birthday</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text"><span class="fa fa-calendar"></span></span>
+                                                    <input name="birthday" data-datepicker="" class="form-control" id="birthday"
                                                    type="text" placeholder="dd/mm/yyyy" value="{{ profile.birthday|date:'m/d/Y'|default:''}}" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="gender">Gender</label>
+                                                <select name="gender" class="form-select mb-0" id="gender"
+                                                    aria-label="Gender select">
+                                                    <option selected>Gender</option>
+                                                    {% for key, value in profile.GENDER_CHOICES %}
+                                                    <option value="{{ key }}" {% if profile.gender == key %} selected{% endif %}>{{ value }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3">
+                                                <div class="form-group">
+                                                    <label for="email">Email</label>
+                                                    <input name="email" class="form-control" id="email" type="email"
+                                                   placeholder="name@company.com" value="{{profile.user.email}}" readonly>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <div class="form-group">
+                                                    <label for="phone">Phone</label>
+                                                    <input name="phone" class="form-control" id="phone" type="number"
+                                                   placeholder="+1 234 567 890" value="{{profile.phone}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-9 mb-3">
+                                                <div class="form-group">
+                                                    <label for="address">Address</label>
+                                                    <input name="address" class="form-control" id="address" type="text"
+                                                   placeholder="Enter your home address" value="{{profile.address|default:''}}">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3 mb-3">
+                                                <div class="form-group">
+                                                    <label for="number">Number</label>
+                                                    <input name="number" class="form-control" id="number" type="number"
+                                                   placeholder="No." value="{{profile.number|default:''}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-4 mb-3">
+                                                <div class="form-group">
+                                                    <label for="city">City</label>
+                                                    <input name="city" class="form-control" id="city" type="text"
+                                                   placeholder="City" value="{{profile.city|default:''}}">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="form-group">
+                                                    <label for="zip">Zip</label>
+                                                    <input name="zip" class="form-control" id="zip" type="tel"
+                                                   placeholder="ZIP" value="{{profile.zip|default:''}}">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row hidden-image-value">
+                                            <div class="form-group">
+                                                <label for="x">x</label>
+                                                <input name="x" class="form-control" id="x" type="text"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="y">y</label>
+                                                <input name="y" class="form-control" id="y" type="text"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="width">width</label>
+                                                <input name="width" class="form-control" id="width" type="text"/>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="height">height</label>
+                                                <input name="height" class="form-control" id="height" type="text"/>
+                                            </div>
+                                        </div>
+                                        <div class="mt-3">
+                                            <button type="submit" class="btn btn-primary">Save All</button>
                                         </div>
                                     </div>
-                                    <div class="col-md-6 mb-3">
-                                        <label for="gender">Gender</label>
-                                        <select name="gender" class="form-select mb-0" id="gender"
-                                            aria-label="Gender select">
-                                            <option selected>Gender</option>
-                                            {% for key, value in profile.GENDER_CHOICES %}
-                                            <option value="{{ key }}" {% if profile.gender == key %}selected{% endif %}>{{ value }}</option>
-                                            {% endfor %}
-                                        </select>
+                                    <div class="col-12 col-xl-4">
+                                        <div class="row">
+                                            <div class="col-12 mb-4">
+                                                <div class="ibox">
+                                                    <div class="ibox-content">
+                                                        <div class="profile-image">
+                                                            <a class="pic-upload-button" data-toggle="modal" data-target="#userProfile">
+                                                            <img src="{{profile.get_avatar}}"
+                                                        class="rounded-circle circle-border m-b-md profile-pic user_image" name="avatar" alt="profile"/></a>
+                                                            <!--div class="p-image">
+                                                                <i class="fa fa-camera upload-button"></i>
+                                                                <button type="button" class="file-upload" data-toggle="modal" data-target="#userProfile"></button>
+                                                                <input class="file-upload" name="avatar" type="file" accept="image/*"/>
+                                                            </div-->
+                                                        </div>
+                                                        <h4 class="no-margins">Name: {{profile.user.get_full_name|default:'N/A'}}</h4>
+                                                        <h5>{{request.user.email}}</h5>
+                                                        <h6>Address: </h6>
+                                                        <small class="text-gray mb-4">{{profile.number|default:'000'}} {{profile.address|default:'wbc dr.'}}</small>
+                                                        <br>
+                                                        <small class="text-gray mb-4">{{profile.city|default:'New York City'}} {{profile.zip|default:'15555'}}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </form>
@@ -71,12 +200,25 @@ display:block
                     </div>
                     <div role="tabpanel" id="tab-security" class="tab-pane">
                         <div class="panel-body">
-                            <p>Lorem ipsum dolor site amet</p>
+                            <div class="row">
+                                <div class="col-12 col-xl-8">
+                                    <div class="ibox">
+                                        <div class="ibox-content">
+                                            <div id="password-reset">
+                                                <h4>Password Reset: </h4>
+                                                <a href="{% url 'password_reset'%}" >
+                                                    <button type="button" class="btn btn-primary">RESET</button>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div role="tabpanel" id="tab-notification" class="tab-pane">
                         <div class="panel-body">
-                            <p>Lorem ipsum dolor site amet</p>
+                            <p>Notification is coming</p>
                         </div>
                     </div>
                 </div>
@@ -86,7 +228,29 @@ display:block
 </div>
 {% endblock %}
 
-
+{% block modals %}
+<div class="modal inmodal" id="userProfile" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content animated bounceInRight">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    <span aria-hidden="true">&times;</span>
+                    <span class="sr-only">Close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div style="position: relative">
+                    <img src={{profile.get_avatar}} id="profileImage" style="max-width: 60%;"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary crop-and-upload">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
 {% block page_js %}
     <script src="{% static 'js/plugins/iCheck/icheck.min.js'%}"></script>
@@ -95,4 +259,45 @@ display:block
     <!-- Custom and plugin javascript -->
     <script src="{% static 'js/inspinia.js'%}"></script>
     <script src="{% static 'js/plugins/pace/pace.min.js'%}"></script>
+    <script src="{% static 'js/plugins/cropper/cropper.min.js'%}"></script>
+
+    <!-- Custom code -->
+    <script type="application/javascript">
+    $(function(){
+        /* Scripts to handle the cropper box */
+        var $image = $("#profileImage");
+        var cropBoxData;
+        var canvasData;
+
+        $("#userProfile").on("show.bs.modal", function(){
+            $image.cropper({
+                viewMode:0,
+                aspectRatio: 1/1,
+                minCropBoxWidth: 200,
+                minCropBoxHeight: 200,
+                checkOrientation: false,
+                background: false,
+                ready: function(){
+                    $image.cropper("setCanvasData", canvasData);
+                    $image.cropper("setCropBoxData", cropBoxData);
+                }
+            });
+        }).on("hidden.bs.modal", function(){
+            cropBoxData = $image.cropper("getCropBoxData");
+            canvasData = $image.cropper("getCanvasData");
+            $image.cropper("destroy")
+        });
+
+        $(".crop-and-upload").click(function(){
+            var cropData = $image.cropper("getData");
+
+            $("#x").val(cropData["x"]);
+            $("#y").val(cropData["y"]);
+            $("#height").val(cropData["height"]);
+            $("#width").val(cropData["width"]);
+
+            $("#formUpload").submit();
+        })
+    })
+    </script>
 {% endblock %}

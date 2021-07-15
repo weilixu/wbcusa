@@ -1,6 +1,8 @@
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django import forms
-from users.models import Profile
+from .models import Profile
+from PIL import Image
+from django.core.files.storage import default_storage as storage
 
 # new user creation
 class NewUserCreationForm(UserCreationForm):
@@ -42,6 +44,7 @@ class NewUserCreationForm(UserCreationForm):
     class Meta(UserCreationForm.Meta):
         fields = UserCreationForm.Meta.fields + ("email",)
 
+
 # user login
 class UserLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
@@ -64,11 +67,39 @@ class ProfileForm(forms.ModelForm):
     first_name = forms.CharField(max_length=255)
     last_name = forms.CharField(max_length=255)
     email = forms.EmailField()
+    x = forms.FloatField(widget=forms.HiddenInput())
+    y = forms.FloatField(widget=forms.HiddenInput())
+    width = forms.FloatField(widget=forms.HiddenInput())
+    height = forms.FloatField(widget=forms.HiddenInput())
 
     class Meta:
         model = Profile
         fields = '__all__'
         exclude = ['user']
+        extra_fields = ['x', 'y', 'height', 'width']
+
+    def get_field_names(self, declared_fields, info):
+        expanded_fields = super(ProfileForm, self).get_field_names(declared_fields, info)
+
+        if getattr(self.Meta, 'extra_fields', None):
+            return expanded_fields + self.Meta.extra_fields
+        else:
+            return expanded_fields
+
+    def save(self):
+        profile = super(ProfileForm, self).save()
+        x = self.cleaned_data.get('x')
+        y = self.cleaned_data.get('y')
+        w = self.cleaned_data.get('width')
+        h = self.cleaned_data.get('height')
+
+        image = Image.open(profile.avatar)
+        cropped_image = image.crop((x, y, w+x, h+y))
+        resized_image = cropped_image.resize((200, 200), Image.ANTIALIAS)
+        storage_path = storage.open(profile.avatar.name, "wb")
+        resized_image.save(storage_path, 'png')
+        storage_path.close()
+        return profile
 
 
 def form_validation_error(form):

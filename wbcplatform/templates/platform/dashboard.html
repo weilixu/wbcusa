@@ -15,7 +15,7 @@ display:block
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-sm-4">
-            <a href="{url '#'}">
+            <a href="{% url 'profile'%}">
                 <div class="widget lazur-bg p-xl">
                     <h2>{{user.username|default:'Guest'}}</h2>
                     <ul class="list-unstyled m-t-md">
