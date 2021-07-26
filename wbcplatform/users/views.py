@@ -16,17 +16,10 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 from django.views import View
 
-
 # import from app
 from .models import Profile
 from .tokens import account_activation_token
 from .forms import NewUserCreationForm, UserLoginForm, ProfileForm, form_validation_error
-
-
-@login_required(login_url=('accounts/login/'))
-def dashboard(request):
-    return render(request, "platform/dashboard.html")
-
 
 @method_decorator(login_required(login_url='accounts/login/'), name='dispatch')
 class ProfileView(View):
@@ -53,8 +46,7 @@ class ProfileView(View):
 
             messages.success(request, 'Profile saved successfully')
         else:
-            print(form_validation_error(form))
-            # messages.error(request, form_validation_error(form))
+            messages.error(request, form_validation_error(form))
         return redirect('profile')
 
 

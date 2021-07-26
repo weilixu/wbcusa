@@ -6,10 +6,13 @@
 display:block
 {% endblock %}
 
+{% block page_css %}
+<link href="{% static 'css/plugins/dataTables/datatables.min.css'%}" rel="stylesheet">
+{% endblock %}
+
 {% block pagewrapper_status%}
 display:block
 {% endblock %}
-
 
 {% block pagecontent %}
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -32,21 +35,29 @@ display:block
                         <li>
                             <span class="fa fa-phone m-r-xs"></span>
                             <label>Contact:</label>
-                            {{user.phone|default:'(111)111111'}}
+                            {{user.phone|default:'(111)111-1111'}}
                         </li>
                     </ul>
                 </div>
             </a>
         </div>
+        <div class="col-sm-8">
+            <form method="POST" enctype="multipart/form-data" id="datatable_form">
+                {% csrf_token %}
+                <label>File Upload</label>
+                <input name="file" class="form-control" type="file">
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </form>
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="table-responsive">
+                        <table id="data-table" class="table table-striped table-bordered table-hover">
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-<div>
-    {% if user.is_authenticated %}
-        <a href="{% url 'logout' %}">Logout</a>
-        <a href="{% url 'password_change' %}">Change password</a>
-    {% else %}
-        <a href="{% url 'login' %}">Login</a>
-    {% endif %}
 </div>
 {% endblock %}
 
@@ -64,10 +75,73 @@ display:block
     <script src="{% static 'js/inspinia.js'%}"></script>
     <script src="{% static 'js/plugins/pace/pace.min.js'%}"></script>
 
+    <!-- Data table plugin -->
+    <script src="{% static 'js/plugins/dataTables/datatables.min.js'%}"></script>
+    <script src="{% static 'js/plugins/dataTables/dataTables.bootstrap4.min.js'%}"></script>
+
     <!-- Flot -->
     <script src="{% static 'js/plugins/flot/jquery.flot.js'%}"></script>
     <script src="{% static 'js/plugins/flot/jquery.flot.tooltip.min.js'%}"></script>
     <script src="{% static 'js/plugins/flot/jquery.flot.resize.js'%}"></script>
+
+    <!-- Custom Code -->
+    <script type="text/javascript">
+        $('#datatable_form').submit(function(e){
+            e.preventDefault();
+            $form = $(this)
+            let formData = new FormData(this);
+            $.ajax({
+                url: window.location.pathname,
+                type:'POST',
+                data: formData,
+                processData: false,
+                cache: false,
+                contentType:false,
+                success: function(response){
+                    if(response['status'] === 'success'){
+                        let data = JSON.parse(response['data'])
+                        //'model' will need to be revised when the actual program
+                        //is coded
+                        let valueAtIndex1 = data['model']
+                        //table head
+                        var body = "<thead><tr>";
+                        for(const headerKey in data){
+                            body += "<th>" + headerKey + "</th>"
+                        }
+                        body += "</tr></thead><tbody>"
+
+                        for(const key in valueAtIndex1) {
+                            //this is the header
+                            body += "<tr>"
+                            for (const headerKey in data) {
+                                body += "<td>" + data[headerKey][key] + "</td>"
+                            }
+                            body += "</tr>"
+                        }
+                        body += "</tbody>"
+
+                        $("#data-table").append(body)
+                    }
+                    $("#data-table").dataTable({
+                        pageLength: 10,
+                        responsive: true,
+                        buttons: [
+                            {extend: 'copy'},
+                            {extend: 'csv'},
+                            {extend: 'excel', title: 'DataFile'},
+                            {extend: 'print',
+                                customize: function(win){
+                                    $(win.document.body).addClass('white-bg');
+                                    $(win.document.body).css('font-size','10px');
+                                    $(win.document.body).find('table').addClass('compact').css('font-size','inherit');
+                                }
+                            }
+                        ]
+                    });
+                }
+            })
+        })
+    </script>
 {% endblock %}
 
 

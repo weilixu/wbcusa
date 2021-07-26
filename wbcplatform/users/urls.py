@@ -1,5 +1,5 @@
 from django.conf.urls import include, url
-from .views import dashboard, register, activate, ProfileView
+from .views import register, activate, ProfileView
 from django.contrib.auth import views
 from .forms import UserLoginForm
 from django.urls import path
@@ -13,7 +13,6 @@ urlpatterns = [
         activate, name='activate'),
     path('accounts/profile/', ProfileView.as_view(), name="profile"),
     url('accounts/', include("django.contrib.auth.urls")),
-    url('dashboard/', dashboard, name="dashboard"),
     url('oauth/', include("social_django.urls")),
     url('register/', register, name="register"),
 ]
