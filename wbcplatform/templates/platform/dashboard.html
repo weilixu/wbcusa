@@ -8,6 +8,7 @@ display:block
 
 {% block page_css %}
 <link href="{% static 'css/plugins/dataTables/datatables.min.css'%}" rel="stylesheet">
+<link href="{% static 'css/plugins/select2/select2.min.css'%}" rel="stylesheet">
 {% endblock %}
 
 {% block pagewrapper_status%}
@@ -58,6 +59,46 @@ display:block
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox">
+                <div class="ibox-content">
+                    <div class="form-group">
+                        <label class="font-normal">Select three variables</label>
+                        <div>
+                            <select data-placeholder="Choose variables" id="data_selector" class="form-control" multiple="multiple">
+                                <option value="ambient_temp">Ambient Temperature</option>
+                                <option value="zone_temp">Zone Temperature</option>
+                                <option value="fan_speed">Fan Speed</option>
+                                <option value="internal_gain">Internal Gain</option>
+                                <option value="hvac_power">HVAC Power</option>
+                                <option value="solar_rad">Solar Radiation</option>
+                            </select>
+                            <button class="btn btn-primary" id="hour_data_submit" style="margin-top: 10px">Submit</button>
+                        </div>
+                    </div>
+                    <div style="" class="ibox-content" id="canvas">
+                        <div class="empty-spinner" style="height:100%; display: none;">
+                            <div class="sk-spinner sk-spinner-fading-circle">
+                                <div class="sk-circle1 sk-circle"></div>
+                                <div class="sk-circle2 sk-circle"></div>
+                                <div class="sk-circle3 sk-circle"></div>
+                                <div class="sk-circle4 sk-circle"></div>
+                                <div class="sk-circle5 sk-circle"></div>
+                                <div class="sk-circle6 sk-circle"></div>
+                                <div class="sk-circle7 sk-circle"></div>
+                                <div class="sk-circle8 sk-circle"></div>
+                                <div class="sk-circle9 sk-circle"></div>
+                                <div class="sk-circle10 sk-circle"></div>
+                                <div class="sk-circle11 sk-circle"></div>
+                                <div class="sk-circle12 sk-circle"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -75,6 +116,12 @@ display:block
     <script src="{% static 'js/inspinia.js'%}"></script>
     <script src="{% static 'js/plugins/pace/pace.min.js'%}"></script>
 
+    <!-- SELECT2 Plugin -->
+    <script src="{% static 'js/plugins/select2/select2.full.min.js'%}"></script>
+
+    <!-- Plotly -->
+    <script src="https://cdn.plot.ly/plotly-2.3.0.min.js"></script>
+
     <!-- Data table plugin -->
     <script src="{% static 'js/plugins/dataTables/datatables.min.js'%}"></script>
     <script src="{% static 'js/plugins/dataTables/dataTables.bootstrap4.min.js'%}"></script>
@@ -85,7 +132,32 @@ display:block
     <script src="{% static 'js/plugins/flot/jquery.flot.resize.js'%}"></script>
 
     <!-- Custom Code -->
+    <script src="{%static 'js/draw.js'%}"></script>
     <script type="text/javascript">
+        var target_id;
+        var setting = {};
+        var data = {};
+        var chart_data = {}
+
+        //activate select2
+        $('#data_selector').select2();
+
+        $('#hour_data_submit').click(function(){
+            //get the selected variables
+            var selected_data = $("#data_selector").val()
+            if(selected_data.length !== 1){
+                alert("Select ONE variable!!!")
+            }else{
+                //need to confirm that the date time column name is 'DateTime'
+                setting["keys"] = selected_data;
+                setting["app"] = "hourlydata";
+                setting["start"] = "2021/07/28";
+                setting["end"] = "2021/09/21";
+                setting["visual"] = "multiline"
+                draw(setting, 'hourly_data', 'canvas', 'Default title','', window.location.pathname)
+            }
+        });
+
         $('#datatable_form').submit(function(e){
             e.preventDefault();
             $form = $(this)
