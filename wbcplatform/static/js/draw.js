@@ -126,18 +126,18 @@ const color_map = {
     @param title: drawing title
     @param title_style: style of the drawing title
  */
-function draw(data_src, visual, canvas_id, title, title_style, url){
+function draw(data_src, canvas_id, title, title_style, url){
     chart_title = title;
     chart_title_style = title_style;
     //chart_style[canvas_id] = title_style;
 
-    if(visual === 'hourly_data'){
+    var app = data_src['app']
+    if(app === 'hourlydata'){
         draw_hourly(data_src, canvas_id, url)
         var title = "Hourly Time-series Data";
         build_title(title, canvas_id);
         return
     }
-
 }
 
 function draw_hourly(setting, canvas_id, url){
@@ -157,8 +157,8 @@ function draw_hourly(setting, canvas_id, url){
                 var visual = setting['visual'];
                 var keys = setting['keys'];
                 if(visual !== 'line' && visual !=='scatter' && visual !== 'scatter_3d'
-                && visual !== 'table' && keys.length > 1){
-                    visual = 'line';
+                && visual !== 'table' && keys.length > 3){
+                    visual = 'multiline';
                 }
                 if(visual === 'scatter_3d'){
                     if(keys.length === 3){
@@ -183,12 +183,12 @@ function draw_hourly(setting, canvas_id, url){
 
 function draw_multi_line_chart(data, canvas_id){
     var lineData = JSON.parse(data['data']);
-    console.log(lineData)
     var keys = data['keys']
 
     var xData = []
     var yData = []
     var dataLeng = lineData.length;
+    var plotData = []
 
     for(var i=0; i<dataLeng; i++){
         var line = lineData[i];
@@ -200,7 +200,7 @@ function draw_multi_line_chart(data, canvas_id){
                 yData[k] = []
             }
             xData[k].push(line['DateTime'])
-            yData[k].push(line[keys[k]])
+            yData[k].push(fixed_2(line[keys[k]]))
         }
     }
 
@@ -226,12 +226,10 @@ function draw_multi_line_chart(data, canvas_id){
                 size: 12
             }
         };
-        data.push(result, result2);
-    }
+        plotData.push(result, result2);
+    };
     var layout = {
         showlegend: false,
-        height: 600,
-        width: 600,
         xaxis: {
             showline: true,
             showgrid: false,
@@ -261,19 +259,52 @@ function draw_multi_line_chart(data, canvas_id){
             r: 20,
             t: 100
         },
-        annotations: [
-            {
-                
+        annotations:[]
+    };
+
+    for(i=0; i<xData.length; i++){
+        let resultAnnotation = {
+            xref: 'paper',
+            x: 0.05,
+            y: yData[i][0],
+            xanchor: 'right',
+            yanchor: 'middle',
+            text: keys[i] + ' <br> ' + yData[i][0],
+            showarrow:false,
+            font:{
+                family: 'Arial',
+                size: 14,
+                color: 'black'
             }
-        ]
+        };
+        var resultAnnotation2 = {
+            xref:'paper',
+            x: 0.95,
+            y: yData[i][yData[i].length-1],
+            xanchor: 'left',
+            yanchor: 'middle',
+            text: yData[i][yData[i].length-1],
+            font: {
+                family: 'Arial',
+                size: 14,
+                color: 'black'
+            },
+            showarrow: false
+        };
+        layout.annotations.push(resultAnnotation, resultAnnotation2);
     }
 
+    var id="hourly_data_multiline_" + (new Date().getTime());
+    var canvas = $("<div>").attr("id", id);
+    $("#" + canvas_id).html("");
+    $("#" + canvas_id).css("padding-left","0px").append(canvas);
 
+    Plotly.newPlot(id, plotData, layout, plotly_option);
+    //resize_plotly_chart(canvas_id, id);
 }
 
 function draw_distribution_chart(data, canvas_id){
     var allData = JSON.parse(data['data']['data']);
-    console.log(allData)
     var key = data['keys']
 
     var dataList=[]
@@ -531,7 +562,7 @@ function plotly_prepHeatmap(rawData, key, type){
 function resize_plotly_chart(canvas_id, chart_id){
     var height = $("#" + canvas_id).outerHeight();
     $("#" + canvas_id).find(".svg_container").css("height", height+'px');
-    Plotly.plots.resize(chart_id)
+    Plotly.plots.resize(chart_id);
 }
 
 function build_title(title, canvas_id){

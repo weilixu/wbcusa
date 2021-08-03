@@ -64,7 +64,7 @@ display:block
             <div class="ibox">
                 <div class="ibox-content">
                     <div class="form-group">
-                        <label class="font-normal">Select three variables</label>
+                        <label class="font-normal">Select variables</label>
                         <div>
                             <select data-placeholder="Choose variables" id="data_selector" class="form-control" multiple="multiple">
                                 <option value="ambient_temp">Ambient Temperature</option>
@@ -74,8 +74,16 @@ display:block
                                 <option value="hvac_power">HVAC Power</option>
                                 <option value="solar_rad">Solar Radiation</option>
                             </select>
-                            <button class="btn btn-primary" id="hour_data_submit" style="margin-top: 10px">Submit</button>
                         </div>
+                        <label class="font-normal">Select plot</label>
+                        <div>
+                            <select data-placeholder="Choose plot" id="plot_selector" class="form-control">
+                                <option value="multiline" selected>Multi-Line</option>
+                                <option value="scatter_3d">Scatter 3D</option>
+                                <option value="heat_map">Heat Map</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" id="hour_data_submit" style="margin-top: 10px">Submit</button>
                     </div>
                     <div style="" class="ibox-content" id="canvas">
                         <div class="empty-spinner" style="height:100%; display: none;">
@@ -141,20 +149,21 @@ display:block
 
         //activate select2
         $('#data_selector').select2();
+        $('#plot_selector').select2();
 
         $('#hour_data_submit').click(function(){
             //get the selected variables
             var selected_data = $("#data_selector").val()
-            if(selected_data.length !== 1){
-                alert("Select ONE variable!!!")
+            if(selected_data.length > 3){
+                alert("Select Three variable!!!")
             }else{
                 //need to confirm that the date time column name is 'DateTime'
                 setting["keys"] = selected_data;
                 setting["app"] = "hourlydata";
                 setting["start"] = "2021/07/28";
                 setting["end"] = "2021/09/21";
-                setting["visual"] = "multiline"
-                draw(setting, 'hourly_data', 'canvas', 'Default title','', window.location.pathname)
+                setting["visual"] = $('#plot_selector').val()
+                draw(setting, 'canvas', 'Default title','', window.location.pathname)
             }
         });
 
