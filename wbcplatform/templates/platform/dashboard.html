@@ -9,6 +9,7 @@ display:block
 {% block page_css %}
 <link href="{% static 'css/plugins/dataTables/datatables.min.css'%}" rel="stylesheet">
 <link href="{% static 'css/plugins/select2/select2.min.css'%}" rel="stylesheet">
+<link href="{% static 'css/plugins/daterangepicker/daterangepicker-bs3.css'%}" rel="stylesheet">
 {% endblock %}
 
 {% block pagewrapper_status%}
@@ -81,7 +82,13 @@ display:block
                                 <option value="multiline" selected>Multi-Line</option>
                                 <option value="scatter_3d">Scatter 3D</option>
                                 <option value="heat_map">Heat Map</option>
+                                <option value="surface_3d">3D Surface</option>
                             </select>
+                        </div>
+                        <label class="font-normal">Select Time Range</label>
+                        <div id="reportrange" class="form-control">
+                            <i class="fa fa-calendar"></i>
+                            <span></span><b class="caret"></b>
                         </div>
                         <button class="btn btn-primary" id="hour_data_submit" style="margin-top: 10px">Submit</button>
                     </div>
@@ -127,6 +134,12 @@ display:block
     <!-- SELECT2 Plugin -->
     <script src="{% static 'js/plugins/select2/select2.full.min.js'%}"></script>
 
+    <!-- Date range use moment.js Moment Plugin -->
+    <script src="{% static 'js/plugins/fullcalendar/moment.min.js'%}"></script>
+
+    <!-- Daterangepicker Plugin -->
+    <script src="{% static 'js/plugins/daterangepicker/daterangepicker.js'%}"></script>
+
     <!-- Plotly -->
     <script src="https://cdn.plot.ly/plotly-2.3.0.min.js"></script>
 
@@ -145,12 +158,59 @@ display:block
         var target_id;
         var setting = {};
         var data = {};
-        var chart_data = {}
+        var chart_data = {};
+
+        //hourly data global parameter
+        //set default to today
+        var startDate = moment().toISOString();
+        var endDate = moment().toISOString();
 
         //activate select2
         $('#data_selector').select2();
         $('#plot_selector').select2();
 
+        //activate datarange
+        $('#reportrange span').html(moment().subtract(29, 'days').format('MMMM D, YYYY') + ' - ' + moment().format('MMMM D, YYYY'));
+        $('#reportrange').daterangepicker({
+            format: 'MM/DD/YYYY',
+            startDate: moment().subtract(29, 'days'),
+            minDate: '01/01/2012',
+            maxDate: moment(),
+            dateLimit: {days: 7},
+            showDropdowns: true,
+            showWeekNumbers: true,
+            timePicker: false,
+            timePickerIncrement: 1,
+            timePicker12Hour: true,
+            ranges:{
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()]
+            },
+            opens:'right',
+            drops: 'down',
+            buttonClasses: ['btn','btn-sm'],
+            applyClass: 'btn-primary',
+            cancelClass: 'btn-default',
+            separator: 'to',
+            local:{
+                applyLabel: 'Submit',
+                cancelLabel: 'Cancel',
+                fromLabel: 'From',
+                toLabel: 'To',
+                customRangeLabel: 'Custom',
+                daysOfWeek: ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr','Sa'],
+                monthNames:['January', 'February', 'March', 'April', 'May', 'June', 'July',
+                'August', 'September', 'October', 'November', 'December'],
+                firstDay: 1
+            }
+        }, function(start, end, label){
+            startDate = start.toISOString();
+            endDate = end.toISOString();
+            $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
+        });
+
+        //submit the form
         $('#hour_data_submit').click(function(){
             //get the selected variables
             var selected_data = $("#data_selector").val()
@@ -160,13 +220,14 @@ display:block
                 //need to confirm that the date time column name is 'DateTime'
                 setting["keys"] = selected_data;
                 setting["app"] = "hourlydata";
-                setting["start"] = "2021/07/28";
-                setting["end"] = "2021/09/21";
-                setting["visual"] = $('#plot_selector').val()
+                setting["visual"] = $('#plot_selector').val();
+                setting["start"] = startDate;
+                setting["end"] = endDate;
                 draw(setting, 'canvas', 'Default title','', window.location.pathname)
             }
         });
 
+        //data table form update
         $('#datatable_form').submit(function(e){
             e.preventDefault();
             $form = $(this)

@@ -175,6 +175,8 @@ function draw_hourly(setting, canvas_id, url){
                     draw_distribution_chart(data, canvas_id)
                 }else if(visual === 'multiline'){
                     draw_multi_line_chart(data, canvas_id)
+                }else if(visual === 'surface_3d'){
+                    draw_3d_surface_chart(data, canvas_id)
                 }
             }
         }
@@ -236,14 +238,12 @@ function draw_multi_line_chart(data, canvas_id){
             showticklabels: true,
             linecolor: 'rgb(204,204,204)',
             linewidth: 2,
-            autotick: false,
+            autotick: true,
             ticks: 'outside',
             tickcolor: 'rgb(204,204,204)',
-            tickwidth: 2,
-            ticklen: 5,
             tickfont: {
                 family: 'Arial',
-                size: 12,
+                size: 10,
                 color: 'rgb(82,82,82)'
             }
         },
@@ -300,7 +300,7 @@ function draw_multi_line_chart(data, canvas_id){
     $("#" + canvas_id).css("padding-left","0px").append(canvas);
 
     Plotly.newPlot(id, plotData, layout, plotly_option);
-    //resize_plotly_chart(canvas_id, id);
+    resize_plotly_chart(canvas_id, id);
 }
 
 function draw_distribution_chart(data, canvas_id){
@@ -498,7 +498,7 @@ function draw_3d_surface_chart(data, canvas_id){
         }
     };
     chart_data[id] = surface_data;
-    Plotly.newPlot(id, surface_data, layout, plotly_options);
+    Plotly.newPlot(id, surface_data, layout, plotly_option);
 
     resize_plotly_chart(canvas_id, id);
 }
@@ -508,6 +508,7 @@ UNFINISHED - Need a more solid understanding on the data before
 implement heat map
  */
 function plotly_prepHeatmap(rawData, key, type){
+    // every 5 min data interval. - this is min hour map
     var firstData = new Date(rawData[0]['DateTime'])
     var year = firstData.getFullYear();
     var from = new Date(year-1, 11, 31);
@@ -529,11 +530,13 @@ function plotly_prepHeatmap(rawData, key, type){
         var value = parseFloat(hourlyObj[key]);
         values[hour].push(value);
 
-        //year count wrap-around
+        //convert hours
         if((+check - +from) >= 864000){
-            var dayStr = (check.getMonth() + 1) + "/" + check.getDate() + "/" + check.getFullYear();
+            var checkDay = check.toISOString();
+            var monthDay = checkDay.substring(0, checkDay.indexOf('T')).split('-');
+            var dayStr = monthDay[1] + '/' + monthDay[2];
             days.push(dayStr);
-            from = check
+            from = check;
         }
     }
     var text = [];
@@ -549,7 +552,7 @@ function plotly_prepHeatmap(rawData, key, type){
         type: type,
         colorscale: 'Viridis',
         name: key,
-        x: days,
+        x: unique(days), //use unique list value.
         y: hourMap,
         z: values,
         text: text,
@@ -562,13 +565,24 @@ function plotly_prepHeatmap(rawData, key, type){
 function resize_plotly_chart(canvas_id, chart_id){
     var height = $("#" + canvas_id).outerHeight();
     $("#" + canvas_id).find(".svg_container").css("height", height+'px');
-    Plotly.plots.resize(chart_id);
+    Plotly.Plots.resize(chart_id);
 }
 
 function build_title(title, canvas_id){
     if(chart_title){
         title=chart_title;
     }
+}
+
+function unique(arr){
+    var u = {}, a=[];
+    for(var i=0, l= arr.length; i<l; ++i){
+        if(!u.hasOwnProperty(arr[i])){
+            a.push(arr[i]);
+            u[arr[i]] = 1;
+        }
+    }
+    return a;
 }
 
 function fixed_2(num){

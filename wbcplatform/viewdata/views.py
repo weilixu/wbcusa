@@ -37,6 +37,9 @@ class DashboardView(View):
             elif setting['visual'] == 'multiline':
                 data = temp_read_data_for_3d(open(DATA_FILE, 'r'), real_keys, start, end)
                 return JsonResponse({'status': 'success', 'data': data, 'keys': real_keys})
+            elif setting['visual'] == 'heat_map' or setting['visual'] == 'surface_3d':
+                data = temp_read_data_for_heatmap(open(DATA_FILE, 'r'), real_keys, start, end)
+                return JsonResponse({'status': 'success', 'data': data, 'keys': real_keys})
         return render(request, "platform/dashboard.html")
 
     def post(self, request):
@@ -70,6 +73,13 @@ def temp_read_data_for_3d(file, keys, start, end):
     df = select_subset_keys_times(file, keys, start, end)
     return df.to_json(orient='records', date_format='iso')
 
+def temp_read_data_for_heatmap(file, keys, start, end):
+    df = select_subset_keys_times(file, keys, start, end)
+    # we average 1 hour data interval
+    df = df.resample('60T').mean()
+    # convert the date index to a column for export
+    df['DateTime'] = df.index
+    return df.to_json(orient='records', date_format='iso')
 
 def select_subset_keys_times(file, keys, start, end):
     df = pd.read_csv(file)
@@ -80,8 +90,8 @@ def select_subset_keys_times(file, keys, start, end):
     df_sub = df[data_key]
 
     # set time limit
-    df_sub['DateTime'] = pd.to_datetime(df_sub['DateTime'])
-    mask = (df_sub['DateTime'] > '6/22/2021  12:00:00 AM') & (df_sub['DateTime'] <= '6/22/2021  1:00:00 AM')
+    df_sub.index = pd.to_datetime(df_sub['DateTime'])
+    mask = (df_sub.index > '6/22/2021  00:00:00 AM') & (df_sub.index <= '6/23/2021  11:00:00 PM')
 
     # select the sub data
     df_sub_sub = df_sub.loc[mask]
