@@ -22,3 +22,4 @@ social-auth-core==4.1.0
 sqlparse==0.4.1
 typing-extensions==3.10.0.0
 urllib3==1.26.6
+bestlab_platform==0.2.1
